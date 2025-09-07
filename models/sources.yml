@@ -1,0 +1,71 @@
+version: 2
+
+sources:
+  - name: raw
+    schema: raw
+    tables:
+      - name: users
+        description: "Raw users table with user roles, firm membership, and sign-up dates."
+        columns:
+          - name: id
+            description: "Primary key identifier for the user."
+            tests:
+              - unique
+              - not_null
+          - name: created
+            description: "Timestamp when the user account was created."
+            tests:
+              - not_null
+          - name: title
+            description: "User's job title (e.g. Associate, Senior Associate, Partner)."
+      - name: events
+        description: "Raw event log table of all user activities."
+        columns:
+          - name: created
+            description: "Event timestamp."
+            tests:
+              - not_null
+          - name: firm_id
+            description: "Firm associated with the user/event."
+            tests:
+              - not_null
+              - relationships:
+                  to: source('raw','firms')
+                  field: id
+          - name: user_id
+            description: "User who generated the event or submitted the query."
+            tests:
+              - not_null
+              - relationships:
+                  to: source('raw','users')
+                  field: id
+          - name: event_type
+            description: "Various query events (e.g. summarize, research, draft, etc.)."
+            tests:
+              - not_null
+          - name: num_docs
+            description: "Number of docs uploaded for the task."
+            tests:
+              - not_null
+          - name: feedback_score
+            description: "Optional feedback score submitted by users on the quality of the task output."
+      - name: firms
+        description: "Firm/Account-level metadata."
+        columns:
+          - name: id
+            description: "Primary key identifier for each firm."
+            tests:
+              - unique
+              - not_null
+          - name: created
+            description: "Date the firm was first created in the platform database."
+            tests:
+              - not_null              
+          - name: firm_size
+            description: "Firm size by total headcount."
+            tests:
+              - not_null
+          - name: arr_in_thousands
+            description: "Annual recurring revenue in thousands (USD), e.g. 100 represents a $100k ARR."
+            tests:
+              - not_null
