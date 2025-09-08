@@ -48,9 +48,9 @@ monthly_user_activity_type AS (
     user_id,
     firm_id,
     month,
-    SUM(CASE WHEN event_type = 'assistant' THEN 1 ELSE 0 END) AS cnt_assistant_queries,
-    SUM(CASE WHEN event_type = 'vault' THEN 1 ELSE 0 END) AS cnt_vault_queries,
-    SUM(CASE WHEN event_type = 'workflow' THEN 1 ELSE 0 END) AS cnt_workflow_queries
+    SUM(CASE WHEN event_type = 'ASSISTANT' THEN 1 ELSE 0 END) AS cnt_assistant_queries,
+    SUM(CASE WHEN event_type = 'VAULT' THEN 1 ELSE 0 END) AS cnt_vault_queries,
+    SUM(CASE WHEN event_type = 'WORKFLOW' THEN 1 ELSE 0 END) AS cnt_workflow_queries
   FROM events 
   GROUP BY 1,2,3
 ),
@@ -66,7 +66,7 @@ final AS (
     COALESCE(t.cnt_assistant_queries, 0) AS cnt_assistant_queries,
     COALESCE(t.cnt_vault_queries, 0) AS cnt_vault_queries,
     COALESCE(t.cnt_workflow_queries, 0) AS cnt_workflow_queries,
-    ROUND(cnt_total_queries / cnt_active_days_in_month, 3) queries_per_active_day,
+    ROUND(COALESCE(cnt_total_queries, 0) / NULLIF(COALESCE(cnt_active_days_in_month,0), 0), 3) AS queries_per_active_day,
 
   -- engagement level categorization
     CASE
